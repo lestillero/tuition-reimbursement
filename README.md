@@ -38,7 +38,8 @@ Login page:
 ![login](https://github.com/lestillero/tuition-reimbursement/blob/main/Screenshots/login.png?raw=true)
 
 Tuition Reimbursement Form page:
-![form](https://github.com/lestillero/tuition-reimbursement/blob/main/Screenshots/reimbursementformdate.png?raw=true)
+![form1](https://github.com/lestillero/tuition-reimbursement/blob/main/Screenshots/reimbursementformdate.png?raw=true)
+![form2](https://github.com/lestillero/tuition-reimbursement/blob/main/Screenshots/reimbursementformsubmit.png?raw=true)
 
 View Requests page:
 ![requestviewer](https://github.com/lestillero/tuition-reimbursement/blob/main/Screenshots/requestviewer.png?raw=true)
