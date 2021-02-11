@@ -1,8 +1,3 @@
--- PL/SQL
-
-commit;
-rollback;
-
 --------------------------------------------------------------------------------------------------------------------------------
 -- create_dept
 
@@ -24,7 +19,7 @@ CALL create_dept('Athletics');
 CALL create_dept('Building Mgmt');
 CALL create_dept('Human Resources');
 
---really these are subdepartments
+--optional subdepartments
 CALL create_dept('Guidance');
 CALL create_dept('Custodian');
 CALL create_dept('Cafeteria');
@@ -40,10 +35,6 @@ CALL create_dept('Sports');
 CALL create_dept('Honors Program');
 CALL create_dept('Student Council');
 
-SELECT * FROM dept;
-
-UPDATE dept SET dept_name = 'Human Resources' WHERE dept_id = 7;
-UPDATE dept SET dept_name = 'Student Services' WHERE dept_id = 3;
 
 --------------------------------------------------------------------------------------------------------------------------------
 -- addto_staff
@@ -66,10 +57,6 @@ CALL addto_staff('Tom', 'Mato', 1, 5);
 CALL addto_staff('Suila', 'Tay', 1, 6);
 CALL addto_staff('Chi', 'Kenudelsoop', 1, 7);
 
-SELECT * FROM staff WHERE dept_id = 3;
-SELECT last_name FROM staff;
-SELECT * FROM staff;
-
 --more employees
 CALL addto_staff('Saw', 'Sedge', 3, 3);
 CALL addto_staff('Jayleede', 'O''knut', 4, 4);
@@ -87,20 +74,14 @@ CALL addto_staff('Blue', 'Berriscone', 7,7);
 --even more employees
 CALL addto_staff('Bea', 'Fa', 8, 3);
 CALL addto_staff('May', 'Pillsirup', 8, 3);
-CALL addto_staff('Sal', 'Odd', 8, 3);
-
+CALL addto_staff('Sal', 'Odd', 3, 3);
 CALL addto_staff('Amber', 'Ohzha', 17, 6);
 CALL addto_staff('Ginger', 'Aille', 23, 6);
-
-UPDATE staff SET supervisor_id = 3 WHERE staff_id = 22;
-
 CALL addto_staff('Basil', 'Pestho', 9, 4);
 CALL addto_staff('Cho', 'Colette', 9, 4);
 CALL addto_staff('Jasmine', 'Ti', 9, 4);
-
 CALL addto_staff('Madeleine', 'Kuki', 10, 4);
 CALL addto_staff('Brian', 'Flaiks', 10, 4);
-
 CALL addto_staff('Fig', 'Newton', 11, 4);
 CALL addto_staff('Candy', 'Kane', 11, 4);
 CALL addto_staff('Darla', 'Puvdazy', 12, 4);
@@ -140,13 +121,3 @@ CALL create_request(27, '03FEB2021', '27FEB2021', '27FEB2021', 'Online', 'Certif
 CALL create_request(11, '03FEB2021', '17FEB2021', '17FEB2021', 'Online', 'Technical training', 'Teaching Virtual Lab and Fieldwork Online', 'Presentation', 140.00);
 CALL create_request(37, '03FEB2021', '10MAY2021', '26AUG2021', 'Online', 'University course', 'Curriculum in Music Education: Vision and Design', 'Letter grade', 1000.00);
 CALL create_request(24, '03FEB2021', '03MAR2021', '04MAR2021', 'Online', 'Technical training', 'Food Service Equipment Safety Training', 'Cert of completion', 45.00);
-
-SELECT * FROM request_info;
-SELECT * FROM request_status;
-SELECT * FROM fund_info;
-
-DELETE FROM request_status WHERE request_id = 2;
-
---------------------------------------------------------------------------------------------------------------------------------
--- play!
-
