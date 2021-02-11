@@ -11,6 +11,7 @@ TRMS is a web application that allows individuals in an organization to submit a
 * Oracle SQL
 * HTML/CSS
 * Javascript
+* Cucumber
 
 
 ## Features
