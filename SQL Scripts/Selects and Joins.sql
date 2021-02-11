@@ -23,8 +23,6 @@ SELECT staff_id, request_info.request_id, status, date_requestor, addtlinfo_requ
     INNER JOIN request_status
     ON request_info.request_id = request_status.request_id
     WHERE staff_id = 4;
-    
-SELECT * FROM staff WHERE last_name = 'Shi';
 
 SELECT request_id, staff.staff_id, supervisor_id, dept_id
     FROM request_info
@@ -36,12 +34,6 @@ SELECT request_id, staff.staff_id, supervisor_id, dept_id
     FROM request_info
     INNER JOIN staff
     ON request_info.staff_id = staff.staff_id;
-
-DELETE request_info WHERE request_id = 30;
-
-UPDATE fund_info SET amt_awarded = 40 WHERE request_id = 27;
-
-UPDATE dept SET dept_head_id = 7 WHERE dept_id = 7;
 
 
 
