@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Tuition Reimbursement Form</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" 
+	rel="stylesheet" 
+	integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" 
+	crossorigin="anonymous">
+	
+<style>
+
+	body {
+		background-color: steelblue;
+		color: whitesmoke;
+		text-align: center;
+	}
+
+	button {
+		background-color: white;
+		border-radius: 12px;
+		border: 1px solid lightsteelblue;
+
+		color: slategray;
+	}
+
+	input {
+		background-color: white;
+		border-radius: 6px;
+		border: 2px solid lightsteelblue;
+
+		color: lightslategray;
+	}
+
+	select {
+		background-color: white;
+		border-radius: 6px;
+		border: 2px solid silver;
+
+		color: lightslategray;
+	}
+
+	table {
+		margin: 0 auto;
+		border-collapse: separate;
+		border-spacing: 10px 15px;
+	}
+
+	.leftcol {
+		text-align: right;
+	}
+
+	.rightcol {
+		text-align: left;
+	}
+	
+	a {
+		color: slategray;
+		text-decoration: none;
+	}
+
+	a:visited {
+		color: slategray;
+		text-decoration: none;
+	}
+	
+	#back {
+		float: left;
+		margin-top: 10px;
+		margin-left: 10px;
+		height: 25px;
+		width: 150px;
+		font-size: 14px;
+	}
+
+</style>
+
+</head>
+<body>
+
+<div>
+<button id="back"><a href='http://localhost:8080/TRMS/options.html'>Return to Options</a></button>
+</div>
+
+<br><br><br>
+
+<h1>Tuition Reimbursement Form</h1>
+
+Please fill out the following fields and click "Submit Request" to complete your form.<br>
+
+<b>Please note:</b> you MUST complete a form for each event at least one week prior to the start of the event.<br>
+
+Not adhering to this policy may result in non-reimbursement.
+
+<br><br><br><br>
+
+
+
+
+<h3>Employee Information</h3>
+
+<br>
+
+<table>
+	<tr>
+		<td class="leftcol">First Name</td>
+		<td class="rightcol"><input type="text" id="first_name"></td>
+	</tr>
+	<tr>
+		<td class="leftcol">Last Name</td>
+		<td class="rightcol"><input type="text" id="last_name"></td>
+	</tr>
+	<tr>
+		<td class="leftcol">Date of Request</td>
+		<td class="rightcol"><input type="date" id="date_requestor"></td>
+	</tr>
+</table>
+
+<br><br>
+
+<h3>Event Information</h3><br>
+
+<table>
+	<tr>
+		<td class="leftcol">Event Name</td>
+		<td class="rightcol"><input type="text" id="description"></td>
+	</tr>
+	<tr>
+		<td class="leftcol">Event Type</td>
+		<td class="rightcol"><select id="event_type">
+			<option value="University course">University Course</option>
+			<option value="Seminar">Seminar</option>
+			<option value="Certification prep class">Certification Prep Class</option>
+			<option value="Certification">Certification</option>
+			<option value="Technical training">Technical Training</option>
+			<option value="Other">Other</option>
+			</select></td>
+	</tr>
+	<tr>
+		<td class="leftcol">Location</td>
+		<td class="rightcol"><input type="text" id="location"></td>
+	</tr>
+	<tr>
+		<td class="leftcol">Start Date</td>
+		<td class="rightcol"><input type="date" id="date_start"></td>
+	</tr>
+	<tr>
+		<td class="leftcol">End Date</td>
+		<td class="rightcol"><input type="date" id="date_end"></td>
+	</tr>
+	<tr>
+		<td class="leftcol">Grading Format</td>
+		<td class="rightcol"><select id="grading_format">
+			<option value="Cert of completion">Certificate of Completion</option>
+			<option value="Letter grade">Letter Grade</option>
+			<option value="Percentage grade">Percentage Grade</option>
+			<option value="Presentation">Presentation</option>
+			</select></td>
+	</tr>
+	<tr>
+		<td class="leftcol">Supporting Documents</td>
+		<td class="rightcol"><input type="text" id="supporting_docs"></td>
+	</tr>
+	<tr>
+		<td class="leftcol">Amount Requesting</td>
+		<td class="rightcol"><input type="number" id="amt_requested"></td>
+	</tr>
+</table>
+
+<br><br>
+
+<button onclick="createRequest()">Submit Request</button>
+
+<br><br>
+
+<div id="return"></div>
+
+<br><br><br><br>
+
+</body>
+
+<script>
+
+function createRequest() {
+	
+	let requesthelper = {
+		staff_id: 0,
+		date_requestor: document.getElementById("date_requestor").value,
+		date_start: document.getElementById("date_start").value,
+		date_end: document.getElementById("date_end").value,
+		location: document.getElementById("location").value,
+		event_type: document.getElementById("event_type").value,
+		description: document.getElementById("description").value,
+		grading_format: document.getElementById("grading_format").value,
+		amt_requested: document.getElementById("amt_requested").value
+	}
+	
+	console.log(requesthelper);
+	console.log(JSON.stringify(requesthelper));
+	
+	let xhttp = new XMLHttpRequest();
+	
+	xhttp.onreadystatechange = function() {
+		
+		if (this.readyState == 4 && this.status == 200) {
+			console.log("Request submitted successfully");
+			console.log(this.responseText);
+			
+			document.getElementById("return").innerHTML = "<button><a href='http://localhost:8080/TRMS/options.html'>Return to Options</a></button>";
+			
+		}
+	}
+	
+	xhttp.open("POST", "http://localhost:8080/TRMS/createRequest.do", true);
+	
+	xhttp.setRequestHeader('Content-Type', 'application/json');
+	
+	xhttp.send(JSON.stringify(requesthelper));
+			
+}
+	
+</script>
+
+</html>

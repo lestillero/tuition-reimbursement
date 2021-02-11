@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Request Viewer</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" 
+	rel="stylesheet" 
+	integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" 
+	crossorigin="anonymous">
+	
+<style>
+
+	body {
+		background-color: steelblue;
+		color: whitesmoke;
+		text-align: center;
+	}
+
+	button {
+		background-color: white;
+		border-radius: 12px;
+		border: 1px solid lightsteelblue;
+
+		color: slategray;
+	}
+
+	a {
+		color: slategray;
+		text-decoration: none;
+	}
+
+	a:visited {
+		color: slategray;
+		text-decoration: none;
+	}
+	
+	.leftTable {
+		margin-left: 20px;
+	}
+	
+	table {
+		border-collapse: separate;
+		border-spacing: 10px 15px;
+	}
+	
+	#back {
+		float: left;
+		margin-top: 10px;
+		margin-left: 10px;
+		height: 25px;
+		width: 135px;
+		font-size: 14px;
+	}
+
+</style>
+
+</head>
+<body>
+
+<div>
+<button id="back"><a href='http://localhost:8080/TRMS/options.html'>Return to Options</a></button>
+</div>
+
+<br><br><br>
+
+<h1>Manage My Requests</h1><br>
+	
+<button onclick="populateRequests()">View My Requests</button>
+
+<br><br><br><br>
+
+<div class="leftTable">
+<h3 id="myRequests" style="text-align: left; margin-left: 35px"></h3>
+<table>
+	<tr>
+		<th></th>
+		<th id="requestStatus"></th>
+		<th id="info"></th>
+		<th id="messages"></th>
+	</tr>
+	<tr>
+		<td id="r0name"></td>
+		<td id="r0stat"></td>
+		<td id="r0info"></td>
+		<td id="r0m"></td>
+	</tr>
+	<tr>
+		<td id="r1name"></td>
+		<td id="r1stat"></td>
+		<td id="r1info"></td>
+		<td id="r1m"></td>
+	</tr>
+	<tr>
+		<td id="r2name"></td>
+		<td id="r2stat"></td>
+		<td id="r2info"></td>
+		<td id="r2m"></td>
+	</tr>
+</table>
+</div>
+
+<br><br><br>
+
+<div id="requestDisplay">
+<h4></h4>
+<table>
+</table>
+</div>
+
+<br><br><br><br>
+
+</body>
+<script>
+
+	let r0id;
+	let r1id;
+	let r2id;
+
+	function populateRequests() {
+		
+		let xhttp = new XMLHttpRequest();
+		
+		xhttp.onreadystatechange = function() {
+			
+			if(this.readyState == 4 && this.status == 200) {
+				
+				console.log("Populated requests successfully");
+				let requests = JSON.parse(this.responseText);
+				console.log(requests);
+				
+				if (requests[0] != undefined) {
+					
+					document.getElementById("myRequests").innerHTML = "My Requests";
+					document.getElementById("requestStatus").innerHTML = "REQUEST STATUS";
+					document.getElementById("info").innerHTML = "INFO";
+					document.getElementById("messages").innerHTML = "MESSAGES";
+					
+					r0id = requests[0].request_id;
+					document.getElementById("r0name").innerHTML = "1.";
+					document.getElementById("r0stat").innerHTML = requests[0].status;
+					document.getElementById("r0info").innerHTML = "<button onclick='displayr0info()'>INFO</button>";
+					document.getElementById("r0m").innerHTML = "<button onclick='displayr0statusmessages()'>MESSAGES</button>";
+					
+				} else {
+					document.getElementById("myRequests").innerHTML = "You have no open requests."
+				}
+				
+				if (requests[1] != undefined) {
+					r1id = requests[1].request_id;
+					document.getElementById("r1name").innerHTML = "2.";
+					document.getElementById("r1stat").innerHTML = requests[1].status;
+					document.getElementById("r1info").innerHTML = "<button onclick='displayr1info()'>INFO</button>";
+					document.getElementById("r1m").innerHTML = "<button onclick='displayr1statusmessages()'>MESSAGES</button>";
+				}
+				
+				if (requests[2] != undefined) {
+					r2id = requests[2].request_id;
+					document.getElementById("r2name").innerHTML = "3.";
+					document.getElementById("r2stat").innerHTML = requests[2].status;
+					document.getElementById("r2info").innerHTML = "<button onclick='displayr2info()'>INFO</button>";
+					document.getElementById("r2m").innerHTML = "<button onclick='displayr2statusmessages()'>MESSAGES</button>";
+				}
+				
+				
+			}
+			
+		}
+		
+		xhttp.open("GET", "http://localhost:8080/TRMS/getMyRequestStatuses.do", true);
+		
+		xhttp.send();
+		
+	}
+	
+	function displayr0info() {
+		
+		let xhttpr0 = new XMLHttpRequest();
+		
+		xhttpr0.onreadystatechange = function() {
+			
+			if(this.readyState == 4 && this.status == 200) {
+				
+				console.log("Top request info found successfully");
+				
+				let r0 = JSON.parse(this.responseText);
+				console.log(r0);
+				
+				let r0info = `<h4>REQUEST 1:</h4>
+					Description: ${r0.ri.description}<br>
+					Event Type: ${r0.ri.event_type}<br>
+					Location: ${r0.ri.location}<br>
+					Dates: ${r0.ri.date_start} to ${r0.ri.date_end}<br>
+					<br>
+					Grading Format: ${r0.ri.grading_format}<br>
+					Passed? ${r0.ri.passing_grade_verif}<br>
+					<br>
+					Amount Requested: $${r0.fi.amt_requested}<br>
+					Amount Awarded: $${r0.fi.amt_awarded}<br>
+					Amount Reimbursed: $${r0.fi.amt_reimbursed}`
+							
+				document.getElementById("requestDisplay").innerHTML = r0info;
+				
+			}
+		}
+		
+		xhttpr0.open("GET", "http://localhost:8080/TRMS/getRequest.do?rid=" + r0id, true);
+		
+		xhttpr0.send();
+		
+	}
+	
+	function displayr1info() {
+		
+		let xhttpr1 = new XMLHttpRequest();
+		
+		xhttpr1.onreadystatechange = function() {
+			
+			if(this.readyState == 4 && this.status == 200) {
+				
+				console.log("Middle request info found successfully");
+				
+				let r1 = JSON.parse(this.responseText);
+				console.log(r1);
+				
+				let r1info = `<h4>REQUEST 2:</h4>
+					Description: ${r1.ri.description}<br>
+					Event Type: ${r1.ri.event_type}<br>
+					Location: ${r1.ri.location}<br>
+					Dates: ${r1.ri.date_start} to ${r1.ri.date_end}<br>
+					<br>
+					Grading Format: ${r1.ri.grading_format}<br>
+					Passed? ${r1.ri.passing_grade_verif}<br>
+					<br>
+					Amount Requested: $${r1.fi.amt_requested}<br>
+					Amount Awarded: $${r1.fi.amt_awarded}<br>
+					Amount Reimbursed: $${r1.fi.amt_reimbursed}`
+							
+				document.getElementById("requestDisplay").innerHTML = r1info;
+				
+			}
+		}
+		
+		xhttpr1.open("GET", "http://localhost:8080/TRMS/getRequest.do?rid=" + r1id, true);
+		
+		xhttpr1.send();
+		
+	}
+	
+	function displayr2info() {
+		
+		let xhttpr2 = new XMLHttpRequest();
+		
+		xhttpr2.onreadystatechange = function() {
+			
+			if(this.readyState == 4 && this.status == 200) {
+				
+				console.log("Bottom request info found successfully");
+				
+				let r2 = JSON.parse(this.responseText);
+				console.log(r2);
+				
+				let r2info = `<h4>REQUEST 3:</h4>
+					Description: ${r2.ri.description}<br>
+					Event Type: ${r2.ri.event_type}<br>
+					Location: ${r2.ri.location}<br>
+					Dates: ${r2.ri.date_start} to ${r2.ri.date_end}<br>
+					<br>
+					Grading Format: ${r2.ri.grading_format}<br>
+					Passed? ${r2.ri.passing_grade_verif}<br>
+					<br>
+					Amount Requested: $${r2.fi.amt_requested}<br>
+					Amount Awarded: $${r2.fi.amt_awarded}<br>
+					Amount Reimbursed: $${r2.fi.amt_reimbursed}`
+							
+				document.getElementById("requestDisplay").innerHTML = r2info;
+				
+			}
+		}
+		
+		xhttpr2.open("GET", "http://localhost:8080/TRMS/getRequest.do?rid=" + r2id, true);
+		
+		xhttpr2.send();
+		
+	}
+	
+	function displayr0statusmessages() {
+		
+		let xhttpr0sm = new XMLHttpRequest();
+		
+		xhttpr0sm.onreadystatechange = function() {
+			
+			if(this.readyState == 4 && this.status == 200) {
+				
+				console.log("Top request status messages found successfully");
+				
+				let r0sm = JSON.parse(this.responseText);
+				console.log(r0sm);
+				
+				let r0sminfo = `<h4>REQUEST 1:</h4>
+					Status: ${r0sm.rs.status}<br>
+					<br>
+					<b>REQUESTOR MESSAGES</b><br>
+					Date of Request: ${r0sm.rs.date_requestor}<br>
+					Additional Info: ${r0sm.rs.addtlinfo_requestor}<br>
+					<br>
+					<b>DIRECT SUPERVISOR MESSAGES</b><br>
+					Date of Approval/Denial: ${r0sm.rs.date_supervisor}<br>
+					Additional Info: ${r0sm.rs.addtlinfo_supervisor}<br>
+					<br>
+					<b>DEPT HEAD MESSAGES</b><br>
+					Date of Approval/Denial: ${r0sm.rs.date_dept}<br>
+					Additional Info: ${r0sm.rs.addtlinfo_dept}<br>
+					<br>
+					<b>BENEFITS COORDINATOR MESSAGES</b><br>
+					Date of Approval/Denial: ${r0sm.rs.date_benco}<br>
+					Additional Info: ${r0sm.rs.addtlinfo_benco}`
+							
+				document.getElementById("requestDisplay").innerHTML = r0sminfo;
+				
+			}
+		}
+		
+		xhttpr0sm.open("GET", "http://localhost:8080/TRMS/getRequest.do?rid=" + r0id, true);
+		
+		xhttpr0sm.send();
+
+	}
+	
+	function displayr1statusmessages() {
+		
+		let xhttpr1sm = new XMLHttpRequest();
+		
+		xhttpr1sm.onreadystatechange = function() {
+			
+			if(this.readyState == 4 && this.status == 200) {
+				
+				console.log("Middle request status messages found successfully");
+				
+				let r1sm = JSON.parse(this.responseText);
+				console.log(r1sm);
+				
+				let r1sminfo = `<h4>REQUEST 2:</h4>
+					Status: ${r1sm.rs.status}<br>
+					<br>
+					<b>REQUESTOR MESSAGES</b><br>
+					Date of Request: ${r1sm.rs.date_requestor}<br>
+					Additional Info: ${r1sm.rs.addtlinfo_requestor}<br>
+					<br>
+					<b>DIRECT SUPERVISOR MESSAGES</b><br>
+					Date of Approval/Denial: ${r1sm.rs.date_supervisor}<br>
+					Additional Info: ${r1sm.rs.addtlinfo_supervisor}<br>
+					<br>
+					<b>DEPT HEAD MESSAGES</b><br>
+					Date of Approval/Denial: ${r1sm.rs.date_dept}<br>
+					Additional Info: ${r1sm.rs.addtlinfo_dept}<br>
+					<br>
+					<b>BENEFITS COORDINATOR MESSAGES</b><br>
+					Date of Approval/Denial: ${r1sm.rs.date_benco}<br>
+					Additional Info: ${r1sm.rs.addtlinfo_benco}`
+							
+				document.getElementById("requestDisplay").innerHTML = r1sminfo;
+				
+			}
+		}
+		
+		xhttpr1sm.open("GET", "http://localhost:8080/TRMS/getRequest.do?rid=" + r1id, true);
+		
+		xhttpr1sm.send();
+
+	}
+	
+	function displayr2statusmessages() {
+		
+		let xhttpr2sm = new XMLHttpRequest();
+		
+		xhttpr2sm.onreadystatechange = function() {
+			
+			if(this.readyState == 4 && this.status == 200) {
+				
+				console.log("Middle request status messages found successfully");
+				
+				let r2sm = JSON.parse(this.responseText);
+				console.log(r2sm);
+				
+				let r2sminfo = `<h4>REQUEST 3:</h4>
+					Status: ${r2sm.rs.status}<br>
+					<br>
+					<b>REQUESTOR MESSAGES</b><br>
+					Date of Request: ${r2sm.rs.date_requestor}<br>
+					Additional Info: ${r2sm.rs.addtlinfo_requestor}<br>
+					<br>
+					<b>DIRECT SUPERVISOR MESSAGES</b><br>
+					Date of Approval/Denial: ${r2sm.rs.date_supervisor}<br>
+					Additional Info: ${r2sm.rs.addtlinfo_supervisor}<br>
+					<br>
+					<b>DEPT HEAD MESSAGES</b><br>
+					Date of Approval/Denial: ${r2sm.rs.date_dept}<br>
+					Additional Info: ${r2sm.rs.addtlinfo_dept}<br>
+					<br>
+					<b>BENEFITS COORDINATOR MESSAGES</b><br>
+					Date of Approval/Denial: ${r2sm.rs.date_benco}<br>
+					Additional Info: ${r2sm.rs.addtlinfo_benco}`
+							
+				document.getElementById("requestDisplay").innerHTML = r2sminfo;
+				
+			}
+		}
+		
+		xhttpr2sm.open("GET", "http://localhost:8080/TRMS/getRequest.do?rid=" + r2id, true);
+		
+		xhttpr2sm.send();
+
+	}
+	
+</script>
+</html>

@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Message Center</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" 
+	rel="stylesheet" 
+	integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" 
+	crossorigin="anonymous">
+	
+<style>
+
+	body {
+		background-color: steelblue;
+		color: whitesmoke;
+		text-align: center;
+	}
+
+	button {
+		background-color: white;
+		border-radius: 12px;
+		border: 1px solid lightsteelblue;
+
+		color: slategray;
+	}
+
+	table {
+		text-align: center;
+		border-collapse: separate;
+		border-spacing: 10px 15px;
+	}
+
+	a {
+		color: slategray;
+		text-decoration: none;
+	}
+
+	a:visited {
+		color: slategray;
+		text-decoration: none;
+	}
+	
+	.leftTable {
+		margin-left: 20px;
+	}
+	
+	#back {
+		float: left;
+		margin-top: 10px;
+		margin-left: 10px;
+		height: 25px;
+		width: 150px;
+		font-size: 14px;
+	}
+
+</style>
+
+</head>
+<body>
+
+<div>
+<button id="back"><a href='http://localhost:8080/TRMS/options.html'>Return to Options</a></button>
+</div>
+
+<br><br><br>
+
+<h1>Manage Pending Requests</h1><br>
+
+<button onclick="populatePendingRequests()">View Pending Requests</button>
+
+<br><br><br><br>
+
+<div class="leftTable">
+<h3 id="pendingRequests" style="text-align: left; margin-left: 35px"></h3>
+<table>
+	<tr>
+		<th></th>
+		<th id="info"></th>
+		<th id="messages"></th>
+	</tr>
+	<tr>
+		<td id="p0enum"></td>
+		<td id="p0info"></td>
+		<td id="p0m"></td>
+	</tr>
+	<tr>
+		<td id="p1enum"></td>
+		<td id="p1info"></td>
+		<td id="p1m"></td>
+	</tr>
+	<tr>
+		<td id="p2enum"></td>
+		<td id="p2info"></td>
+		<td id="p2m"></td>
+	</tr>
+	<tr>
+		<td id="p3enum"></td>
+		<td id="p3info"></td>
+		<td id="p3m"></td>
+	</tr>
+	<tr>
+		<td id="p4enum"></td>
+		<td id="p4info"></td>
+		<td id="p4m"></td>
+	</tr>
+</table>
+</div>
+
+<br><br><br>
+
+<div id="pendingDisplay"></div>
+
+<br><br>
+
+<div id="approverDisplay">
+<span id="approveRequest"></span>
+<span id="denyRequest"></span>
+</div>
+
+<br><br>
+
+<div id="approverSuccess"></div>
+
+<br><br><br><br>
+
+</body>
+
+<script>
+
+	let p0id;
+	let p1id;
+	let p2id;
+	let p3id;
+	let p4id;
+	
+	let p0sm;
+	let p1sm;
+	let p2sm;
+	let p3sm;
+	let p4sm;
+	
+	function populatePendingRequests() {
+		
+		let xhttp = new XMLHttpRequest();
+		
+		xhttp.onreadystatechange = function() {
+			
+			if(this.readyState == 4 && this.status == 200) {
+				
+				console.log("Populated pending requests successfully");
+				let pending = JSON.parse(this.responseText);
+				console.log(pending);
+				
+				if (pending[0] != undefined) {
+					
+					document.getElementById("pendingRequests").innerHTML = "Pending Requests";
+					document.getElementById("info").innerHTML = "INFO";
+					document.getElementById("messages").innerHTML = "MESSAGES";
+					
+					p0id = pending[0].request_id;
+					document.getElementById("p0enum").innerHTML = "1.";
+					document.getElementById("p0info").innerHTML = "<button onclick='displayp0info()'>INFO</button>";
+					document.getElementById("p0m").innerHTML = "<button onclick='displayp0statusmessages()'>MESSAGES</button>";
+				
+				} else {
+					document.getElementById("pendingRequests").innerHTML = "You have no pending requests."
+				}
+				
+				if (pending[1] != undefined) {
+					p1id = pending[1].request_id;
+					document.getElementById("p1enum").innerHTML = "2.";
+					document.getElementById("p1info").innerHTML = "<button onclick='displayp1info()'>INFO</button>";
+					document.getElementById("p1m").innerHTML = "<button onclick='displayp1statusmessages()'>MESSAGES</button>";
+				}
+				
+				if (pending[2] != undefined) {
+					p2id = pending[2].request_id;
+					document.getElementById("p2enum").innerHTML = "3.";
+					document.getElementById("p2info").innerHTML = "<button onclick='displayp2info()'>INFO</button>";
+					document.getElementById("p2m").innerHTML = "<button onclick='displayp2statusmessages()'>MESSAGES</button>";
+				}
+				
+				if (pending[3] != undefined) {
+					p3id = pending[3].request_id;
+					document.getElementById("p3enum").innerHTML = "4.";
+					document.getElementById("p3info").innerHTML = "<button onclick='displayp3info()'>INFO</button>";
+					document.getElementById("p3m").innerHTML = "<button onclick='displayp3statusmessages()'>MESSAGES</button>";
+				}
+				
+				if (pending[4] != undefined) {
+					p4id = pending[4].request_id;
+					document.getElementById("p4enum").innerHTML = "5.";
+					document.getElementById("p4info").innerHTML = "<button onclick='displayp4info()'>INFO</button>";
+					document.getElementById("p4m").innerHTML = "<button onclick='displayp4statusmessages()'>MESSAGES</button>";
+				}
+				
+			}
+			
+		}
+		
+		xhttp.open("GET", "http://localhost:8080/TRMS/getPendingRequestsInfo.do", true);
+		
+		xhttp.send();
+		
+	}
+	
+	//-------------------------------------------------------------------------------------------------------------------------
+	
+	function displayp0info() {
+		
+		let xhttpp0 = new XMLHttpRequest();
+		
+		xhttpp0.onreadystatechange = function() {
+			
+			if(this.readyState == 4 && this.status == 200) {
+				
+				console.log("First request info found successfully");
+				
+				let p0 = JSON.parse(this.responseText);
+				console.log(p0);
+				
+				let p0info = `<h4>PENDING REQUEST 1:</h4>
+					Description: ${p0.ri.description}<br>
+					Event Type: ${p0.ri.event_type}<br>
+					Location: ${p0.ri.location}<br>
+					Dates: ${p0.ri.date_start} to ${p0.ri.date_end}<br>
+					<br>
+					Grading Format: ${p0.ri.grading_format}<br>
+					Passed? ${p0.ri.passing_grade_verif}<br>
+					<br>
+					Amount Requested: $${p0.fi.amt_requested}<br>
+					Amount Awarded: $${p0.fi.amt_awarded}<br>
+					Amount Reimbursed: $${p0.fi.amt_reimbursed}`
+							
+				document.getElementById("pendingDisplay").innerHTML = p0info;
+					
+				document.getElementById("approveRequest").innerHTML = 
+					"<button class='btn btn-success' onclick='approve(p0id)'>APPROVE</button>";
+					
+				document.getElementById("denyRequest").innerHTML =
+					"<button class='btn btn-danger' onclick='deny(p0id)'>DENY</button>";
+				
+			}
+		}
+		
+		xhttpp0.open("GET", "http://localhost:8080/TRMS/getRequest.do?rid=" + p0id, true);
+		
+		xhttpp0.send();
+		
+	}
+	
+	function displayp1info() {
+		
+		let xhttpp1 = new XMLHttpRequest();
+		
+		xhttpp1.onreadystatechange = function() {
+			
+			if(this.readyState == 4 && this.status == 200) {
+				
+				console.log("Second request info found successfully");
+				
+				let p1 = JSON.parse(this.responseText);
+				console.log(p1);
+				
+				let p1info = `<h4>PENDING REQUEST 2:</h4>
+					Description: ${p1.ri.description}<br>
+					Event Type: ${p1.ri.event_type}<br>
+					Location: ${p1.ri.location}<br>
+					Dates: ${p1.ri.date_start} to ${p1.ri.date_end}<br>
+					<br>
+					Grading Format: ${p1.ri.grading_format}<br>
+					Passed? ${p1.ri.passing_grade_verif}<br>
+					<br>
+					Amount Requested: $${p1.fi.amt_requested}<br>
+					Amount Awarded: $${p1.fi.amt_awarded}<br>
+					Amount Reimbursed: $${p1.fi.amt_reimbursed}`
+							
+				document.getElementById("pendingDisplay").innerHTML = p1info;
+					
+				document.getElementById("approveRequest").innerHTML =
+					"<button class='btn btn-success' onclick='approve(p1id)'>APPROVE</button>";
+					
+				document.getElementById("denyRequest").innerHTML =
+					"<button class='btn btn-danger' onclick='deny(p1id)'>DENY</button>";
+				
+			}
+		}
+		
+		xhttpp1.open("GET", "http://localhost:8080/TRMS/getRequest.do?rid=" + p1id, true);
+		
+		xhttpp1.send();
+		
+	}
+	
+	function displayp2info() {
+		
+		let xhttpp2 = new XMLHttpRequest();
+		
+		xhttpp2.onreadystatechange = function() {
+			
+			if(this.readyState == 4 && this.status == 200) {
+				
+				console.log("Third request info found successfully");
+				
+				let p2 = JSON.parse(this.responseText);
+				console.log(p2);
+				
+				let p2info = `<h4>PENDING REQUEST 3:</h4>
+					Description: ${p2.ri.description}<br>
+					Event Type: ${p2.ri.event_type}<br>
+					Location: ${p2.ri.location}<br>
+					Dates: ${p2.ri.date_start} to ${p2.ri.date_end}<br>
+					<br>
+					Grading Format: ${p2.ri.grading_format}<br>
+					Passed? ${p2.ri.passing_grade_verif}<br>
+					<br>
+					Amount Requested: $${p2.fi.amt_requested}<br>
+					Amount Awarded: $${p2.fi.amt_awarded}<br>
+					Amount Reimbursed: $${p2.fi.amt_reimbursed}`
+							
+				document.getElementById("pendingDisplay").innerHTML = p2info;
+					
+				document.getElementById("approveRequest").innerHTML =
+					"<button class='btn btn-success' onclick='approve(p2id)'>APPROVE</button>";
+					
+				document.getElementById("denyRequest").innerHTML =
+					"<button class='btn btn-danger' onclick='deny(p2id)'>DENY</button>";
+				
+			}
+		}
+		
+		xhttpp2.open("GET", "http://localhost:8080/TRMS/getRequest.do?rid=" + p2id, true);
+		
+		xhttpp2.send();
+		
+	}
+	
+	function displayp3info() {
+		
+		let xhttpp3 = new XMLHttpRequest();
+		
+		xhttpp3.onreadystatechange = function() {
+			
+			if(this.readyState == 4 && this.status == 200) {
+				
+				console.log("Fourth request info found successfully");
+				
+				let p3 = JSON.parse(this.responseText);
+				console.log(p3);
+				
+				let p3info = `<h4>PENDING REQUEST 4:</h4>
+					Description: ${p3.ri.description}<br>
+					Event Type: ${p3.ri.event_type}<br>
+					Location: ${p3.ri.location}<br>
+					Dates: ${p3.ri.date_start} to ${p3.ri.date_end}<br>
+					<br>
+					Grading Format: ${p3.ri.grading_format}<br>
+					Passed? ${p3.ri.passing_grade_verif}<br>
+					<br>
+					Amount Requested: $${p3.fi.amt_requested}<br>
+					Amount Awarded: $${p3.fi.amt_awarded}<br>
+					Amount Reimbursed: $${p3.fi.amt_reimbursed}`
+							
+				document.getElementById("pendingDisplay").innerHTML = p3info;
+					
+				document.getElementById("approveRequest").innerHTML =
+					"<button class='btn btn-success' onclick='approve(p3id)'>APPROVE</button>";
+					
+				document.getElementById("denyRequest").innerHTML =
+					"<button class='btn btn-danger' onclick='deny(p3id)'>DENY</button>";
+				
+			}
+		}
+		
+		xhttpp3.open("GET", "http://localhost:8080/TRMS/getRequest.do?rid=" + p3id, true);
+		
+		xhttpp3.send();
+		
+	}
+	
+	function displayp4info() {
+		
+		let xhttpp4 = new XMLHttpRequest();
+		
+		xhttpp4.onreadystatechange = function() {
+			
+			if(this.readyState == 4 && this.status == 200) {
+				
+				console.log("Fifth request info found successfully");
+				
+				let p4 = JSON.parse(this.responseText);
+				console.log(p4);
+				
+				let p4info = `<h4>PENDING REQUEST 5:</h4>
+					Description: ${p4.ri.description}<br>
+					Event Type: ${p4.ri.event_type}<br>
+					Location: ${p4.ri.location}<br>
+					Dates: ${p4.ri.date_start} to ${p4.ri.date_end}<br>
+					<br>
+					Grading Format: ${p4.ri.grading_format}<br>
+					Passed? ${p4.ri.passing_grade_verif}<br>
+					<br>
+					Amount Requested: $${p4.fi.amt_requested}<br>
+					Amount Awarded: $${p4.fi.amt_awarded}<br>
+					Amount Reimbursed: $${p4.fi.amt_reimbursed}`
+							
+				document.getElementById("pendingDisplay").innerHTML = p4info;
+					
+				document.getElementById("approveRequest").innerHTML =
+					"<button class='btn btn-success' onclick='approve(p4id)'>APPROVE</button>";
+					
+				document.getElementById("denyRequest").innerHTML =
+					"<button class='btn btn-danger' onclick='deny(p4id)'>DENY</button>";
+				
+			}
+		}
+		
+		xhttpp4.open("GET", "http://localhost:8080/TRMS/getRequest.do?rid=" + p4id, true);
+		
+		xhttpp4.send();
+		
+	}
+	
+	//-------------------------------------------------------------------------------------------------------------------------
+
+	
+	function displayp0statusmessages() {
+		
+		let xhttpp0sm = new XMLHttpRequest();
+		
+		xhttpp0sm.onreadystatechange = function() {
+			
+			if(this.readyState == 4 && this.status == 200) {
+				
+				console.log("First request status messages found successfully");
+				
+				let p0sm = JSON.parse(this.responseText);
+				console.log(p0sm);
+				
+				let p0sminfo = `<h4>REQUEST 1:</h4>
+					Status: ${p0sm.rs.status}<br>
+					<br>
+					<b>REQUESTOR MESSAGES</b><br>
+					Date of Request: ${p0sm.rs.date_requestor}<br>
+					Additional Info: ${p0sm.rs.addtlinfo_requestor}<br>
+					<br>
+					<b>DIRECT SUPERVISOR MESSAGES</b><br>
+					Date of Approval/Denial: ${p0sm.rs.date_supervisor}<br>
+					Additional Info: ${p0sm.rs.addtlinfo_supervisor}<br>
+					<br>
+					<b>DEPT HEAD MESSAGES</b><br>
+					Date of Approval/Denial: ${p0sm.rs.date_dept}<br>
+					Additional Info: ${p0sm.rs.addtlinfo_dept}<br>
+					<br>
+					<b>BENEFITS COORDINATOR MESSAGES</b><br>
+					Date of Approval/Denial: ${p0sm.rs.date_benco}<br>
+					Additional Info: ${p0sm.rs.addtlinfo_benco}`
+							
+				document.getElementById("pendingDisplay").innerHTML = p0sminfo;
+				
+				document.getElementById("approveRequest").innerHTML = "";
+				document.getElementById("denyRequest").innerHTML = "";
+					
+			}
+		}
+		
+		xhttpp0sm.open("GET", "http://localhost:8080/TRMS/getRequest.do?rid=" + p0id, true);
+		
+		xhttpp0sm.send();
+
+	}
+	
+	function displayp1statusmessages() {
+		
+		let xhttpp1sm = new XMLHttpRequest();
+		
+		xhttpp1sm.onreadystatechange = function() {
+			
+			if(this.readyState == 4 && this.status == 200) {
+				
+				console.log("Second request status messages found successfully");
+				
+				let p1sm = JSON.parse(this.responseText);
+				console.log(p1sm);
+				
+				let p1sminfo = `<h4>REQUEST 2:</h4>
+					Status: ${p1sm.rs.status}<br>
+					<br>
+					<b>REQUESTOR MESSAGES</b><br>
+					Date of Request: ${p1sm.rs.date_requestor}<br>
+					Additional Info: ${p1sm.rs.addtlinfo_requestor}<br>
+					<br>
+					<b>DIRECT SUPERVISOR MESSAGES</b><br>
+					Date of Approval/Denial: ${p1sm.rs.date_supervisor}<br>
+					Additional Info: ${p1sm.rs.addtlinfo_supervisor}<br>
+					<br>
+					<b>DEPT HEAD MESSAGES</b><br>
+					Date of Approval/Denial: ${p1sm.rs.date_dept}<br>
+					Additional Info: ${p1sm.rs.addtlinfo_dept}<br>
+					<br>
+					<b>BENEFITS COORDINATOR MESSAGES</b><br>
+					Date of Approval/Denial: ${p1sm.rs.date_benco}<br>
+					Additional Info: ${p1sm.rs.addtlinfo_benco}`
+							
+				document.getElementById("pendingDisplay").innerHTML = p1sminfo;
+				
+				document.getElementById("approveRequest").innerHTML = "";
+				document.getElementById("denyRequest").innerHTML = "";
+					
+			}
+		}
+		
+		xhttpp1sm.open("GET", "http://localhost:8080/TRMS/getRequest.do?rid=" + p1id, true);
+		
+		xhttpp1sm.send();
+
+	}
+	
+	function displayp2statusmessages() {
+		
+		let xhttpp2sm = new XMLHttpRequest();
+		
+		xhttpp2sm.onreadystatechange = function() {
+			
+			if(this.readyState == 4 && this.status == 200) {
+				
+				console.log("Third request status messages found successfully");
+				
+				let p2sm = JSON.parse(this.responseText);
+				console.log(p2sm);
+				
+				let p2sminfo = `<h4>REQUEST 3:</h4>
+					Status: ${p2sm.rs.status}<br>
+					<br>
+					<b>REQUESTOR MESSAGES</b><br>
+					Date of Request: ${p2sm.rs.date_requestor}<br>
+					Additional Info: ${p2sm.rs.addtlinfo_requestor}<br>
+					<br>
+					<b>DIRECT SUPERVISOR MESSAGES</b><br>
+					Date of Approval/Denial: ${p2sm.rs.date_supervisor}<br>
+					Additional Info: ${p2sm.rs.addtlinfo_supervisor}<br>
+					<br>
+					<b>DEPT HEAD MESSAGES</b><br>
+					Date of Approval/Denial: ${p2sm.rs.date_dept}<br>
+					Additional Info: ${p2sm.rs.addtlinfo_dept}<br>
+					<br>
+					<b>BENEFITS COORDINATOR MESSAGES</b><br>
+					Date of Approval/Denial: ${p2sm.rs.date_benco}<br>
+					Additional Info: ${p2sm.rs.addtlinfo_benco}`
+							
+				document.getElementById("pendingDisplay").innerHTML = p2sminfo;
+				
+				document.getElementById("approveRequest").innerHTML = "";
+				document.getElementById("denyRequest").innerHTML = "";
+					
+			}
+		}
+		
+		xhttpp2sm.open("GET", "http://localhost:8080/TRMS/getRequest.do?rid=" + p2id, true);
+		
+		xhttpp2sm.send();
+
+	}
+	
+	function displayp3statusmessages() {
+		
+		let xhttpp3sm = new XMLHttpRequest();
+		
+		xhttpp3sm.onreadystatechange = function() {
+			
+			if(this.readyState == 4 && this.status == 200) {
+				
+				console.log("Fourth request status messages found successfully");
+				
+				let p3sm = JSON.parse(this.responseText);
+				console.log(p3sm);
+				
+				let p3sminfo = `<h4>REQUEST 4:</h4>
+					Status: ${p3sm.rs.status}<br>
+					<br>
+					<b>REQUESTOR MESSAGES</b><br>
+					Date of Request: ${p3sm.rs.date_requestor}<br>
+					Additional Info: ${p3sm.rs.addtlinfo_requestor}<br>
+					<br>
+					<b>DIRECT SUPERVISOR MESSAGES</b><br>
+					Date of Approval/Denial: ${p3sm.rs.date_supervisor}<br>
+					Additional Info: ${p3sm.rs.addtlinfo_supervisor}<br>
+					<br>
+					<b>DEPT HEAD MESSAGES</b><br>
+					Date of Approval/Denial: ${p3sm.rs.date_dept}<br>
+					Additional Info: ${p3sm.rs.addtlinfo_dept}<br>
+					<br>
+					<b>BENEFITS COORDINATOR MESSAGES</b><br>
+					Date of Approval/Denial: ${p3sm.rs.date_benco}<br>
+					Additional Info: ${p3sm.rs.addtlinfo_benco}`
+							
+				document.getElementById("pendingDisplay").innerHTML = p3sminfo;
+				
+				document.getElementById("approveRequest").innerHTML = "";
+				document.getElementById("denyRequest").innerHTML = "";
+					
+			}
+		}
+		
+		xhttpp3sm.open("GET", "http://localhost:8080/TRMS/getRequest.do?rid=" + p3id, true);
+		
+		xhttpp3sm.send();
+
+	}
+	
+	function displayp4statusmessages() {
+		
+		let xhttpp4sm = new XMLHttpRequest();
+		
+		xhttpp4sm.onreadystatechange = function() {
+			
+			if(this.readyState == 4 && this.status == 200) {
+				
+				console.log("Fifth request status messages found successfully");
+				
+				let p4sm = JSON.parse(this.responseText);
+				console.log(p4sm);
+				
+				let p4sminfo = `<h4>REQUEST 5:</h4>
+					Status: ${p4sm.rs.status}<br>
+					<br>
+					<b>REQUESTOR MESSAGES</b><br>
+					Date of Request: ${p4sm.rs.date_requestor}<br>
+					Additional Info: ${p4sm.rs.addtlinfo_requestor}<br>
+					<br>
+					<b>DIRECT SUPERVISOR MESSAGES</b><br>
+					Date of Approval/Denial: ${p4sm.rs.date_supervisor}<br>
+					Additional Info: ${p4sm.rs.addtlinfo_supervisor}<br>
+					<br>
+					<b>DEPT HEAD MESSAGES</b><br>
+					Date of Approval/Denial: ${p4sm.rs.date_dept}<br>
+					Additional Info: ${p4sm.rs.addtlinfo_dept}<br>
+					<br>
+					<b>BENEFITS COORDINATOR MESSAGES</b><br>
+					Date of Approval/Denial: ${p4sm.rs.date_benco}<br>
+					Additional Info: ${p4sm.rs.addtlinfo_benco}`
+							
+				document.getElementById("pendingDisplay").innerHTML = p4sminfo;
+				
+				document.getElementById("approveRequest").innerHTML = "";
+				document.getElementById("denyRequest").innerHTML = "";
+					
+			}
+		}
+		
+		xhttpp4sm.open("GET", "http://localhost:8080/TRMS/getRequest.do?rid=" + p4id, true);
+		
+		xhttpp4sm.send();
+
+	}
+	
+	//-------------------------------------------------------------------------------------------------------------------------
+	
+	function approve(reqid) {
+		
+		let reqwrapper = {
+			request_id: reqid
+		}
+		
+		let xhttpa = new XMLHttpRequest();
+		
+		xhttpa.onreadystagechange = function() {
+			
+			if (this.readyState == 4 && this.status == 200) {
+				console.log("Request approved successfully");
+				console.log(this.responseText);
+				
+				document.getElementById("approverSuccess").innerHTML = "Request approved!";
+				
+			}
+		}
+		
+		xhttpa.open("POST", "http://localhost:8080/TRMS/approve.do", true);
+		
+		xhttpa.setRequestHeader('Content-Type', 'application/json');
+		
+		xhttpa.send(JSON.stringify(reqwrapper));
+		
+	}
+	
+	function deny(reqid) {
+		
+		let reqwrapper = {
+				request_id: reqid
+			}
+		
+		let xhttpd = new XMLHttpRequest();
+		
+		xhttpd.onreadystagechange = function() {
+			
+			if (this.readyState == 4 && this.status == 200) {
+				console.log("Request denied unfortunately");
+				console.log(this.responseText);
+				
+				document.getElementById("approverSuccess").innerHTML = "Request denied!";
+
+			}
+		}
+		
+		xhttpd.open("POST", "http://localhost:8080/TRMS/deny.do", true);
+		
+		xhttpd.setRequestHeader('Content-Type', 'application/json');
+		
+		xhttpd.send(JSON.stringify(reqwrapper));
+		
+	}
+	
+</script>
+
+</html>
